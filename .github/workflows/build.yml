@@ -26,3 +26,83 @@ jobs:
         with:
           name: structurecraft-jar
           path: build/libs/*.jar
+
+  smoke-test:
+    name: server smoke test
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Download built mod jar
+        uses: actions/download-artifact@v4
+        with:
+          name: structurecraft-jar
+          path: artifact
+
+      - name: Prepare server directory
+        run: |
+          mkdir -p server/mods
+          # copy only the main mod jar (skip -sources)
+          find artifact -name '*.jar' ! -name '*-sources.jar' -exec cp {} server/mods/ \;
+          ls -la server/mods
+
+      - name: Download Fabric server launcher (MC 1.20.1 / loader 0.15.11)
+        run: |
+          curl -fsSL -o server/server.jar \
+            "https://meta.fabricmc.net/v2/versions/loader/1.20.1/0.15.11/1.0.1/server/jar"
+
+      - name: Download Fabric API for 1.20.1
+        run: |
+          URL=$(curl -fsSL "https://api.modrinth.com/v2/project/fabric-api/version?game_versions=%5B%221.20.1%22%5D&loaders=%5B%22fabric%22%5D" | jq -r '.[0].files[0].url')
+          echo "Fabric API: $URL"
+          curl -fsSL -o server/mods/fabric-api.jar "$URL"
+
+      - name: Run dedicated server until fully started
+        working-directory: server
+        run: |
+          echo "eula=true" > eula.txt
+          java -Xmx2G -jar server.jar --nogui > server_out.log 2>&1 &
+          PID=$!
+          STARTED=0
+          for i in $(seq 1 60); do
+            if grep -q 'Done (' server_out.log; then STARTED=1; break; fi
+            if ! kill -0 $PID 2>/dev/null; then break; fi
+            sleep 5
+          done
+          kill $PID 2>/dev/null || true
+          sleep 3
+
+          echo "===== OTOMATIK KONTROL ====="
+          MOD_LOADED=$(grep -ci 'structurecraft' server_out.log || true)
+          CRASHED=0
+          ls crash-reports/*.txt >/dev/null 2>&1 && CRASHED=1
+          grep -q 'Failed to start the minecraft server' server_out.log && CRASHED=1
+
+          echo "Server fully started (Done): $([ $STARTED -eq 1 ] && echo PASS || echo FAIL)"
+          echo "Mod 'structurecraft' loaded:  $([ $MOD_LOADED -gt 0 ] && echo PASS || echo FAIL)"
+          echo "No crash detected:            $([ $CRASHED -eq 0 ] && echo PASS || echo FAIL)"
+          echo "----- structurecraft log lines -----"
+          grep -i 'structurecraft' server_out.log || true
+          echo "----- errors (if any) -----"
+          grep -iE 'ERROR|Exception' server_out.log | head -30 || true
+
+          if [ $STARTED -eq 1 ] && [ $MOD_LOADED -gt 0 ] && [ $CRASHED -eq 0 ]; then
+            echo "RESULT: PASS"
+            exit 0
+          else
+            echo "RESULT: FAIL"
+            tail -80 server_out.log
+            exit 1
+          fi
+
+      - name: Upload server log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-log
+          path: server/server_out.log
