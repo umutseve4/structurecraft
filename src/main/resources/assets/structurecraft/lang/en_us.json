@@ -1,0 +1,11 @@
+{
+  "itemGroup.structurecraft.main": "StructureCraft",
+  "item.structurecraft.cozy_home_blueprint": "Blueprint: Cozy Starter Home",
+  "item.structurecraft.fortress_blueprint": "Blueprint: Late-Game Fortress",
+  "item.structurecraft.mega_city_blueprint": "Blueprint: Mega City",
+  "item.structurecraft.skateboard": "Skateboard",
+  "item.structurecraft.airplane": "Airplane",
+  "entity.structurecraft.skateboard": "Skateboard",
+  "entity.structurecraft.airplane": "Airplane",
+  "message.structurecraft.placed": "Structure placed!"
+}
