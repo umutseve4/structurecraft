@@ -22,9 +22,10 @@ A Fabric mod that adds a dedicated **StructureCraft** creative tab containing **
 
 ## Build
 
-Requirements: JDK 17+, internet access (Gradle downloads Fabric Loom + Minecraft).
+Requirements: **JDK 17+**, **Gradle 8.6+** (this repo does not ship the Gradle wrapper binary), internet access (Gradle downloads Fabric Loom + Minecraft).
 
 ```bash
+gradle wrapper --gradle-version 8.8   # one-time: generates gradlew locally
 ./gradlew build
 # jar output: build/libs/structurecraft-1.0.0.jar
 ```
@@ -33,7 +34,7 @@ Drop the jar plus [Fabric API](https://modrinth.com/mod/fabric-api) into `mods/`
 
 ## Status / known limitations
 
-- Code is complete but **not yet compile-verified in CI** — run `./gradlew build` locally first.
+- Code is complete but **not yet compile-verified in CI** — run the build locally first.
 - Structures generate relative to the clicked block; terrain is not flattened first.
 - Vehicles use vanilla textures (planks/iron) mapped onto simple cuboid models; no custom PNG assets required.
 
