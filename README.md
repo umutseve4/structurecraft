@@ -1,5 +1,7 @@
 # StructureCraft (Fabric 1.20.1)
 
+[![CI](https://github.com/umutseve4/structurecraft/actions/workflows/build.yml/badge.svg)](https://github.com/umutseve4/structurecraft/actions/workflows/build.yml)
+
 A Fabric mod that adds a dedicated **StructureCraft** creative tab containing **blueprint items** that instantly generate full structures in-world, plus two **custom vehicles**.
 
 ## Content
@@ -32,9 +34,16 @@ gradle wrapper --gradle-version 8.8   # one-time: generates gradlew locally
 
 Drop the jar plus [Fabric API](https://modrinth.com/mod/fabric-api) into `mods/` of a Fabric Loader 1.20.1 instance.
 
+## CI
+
+Every push and PR runs GitHub Actions (`build.yml`):
+
+1. **build** — compiles the mod (JDK 17, Gradle 8.8) and uploads the jar artifact.
+2. **smoke-test** — boots a real Fabric 1.20.1 dedicated server (loader 0.15.11) with the mod installed and asserts the server reaches `Done (`, printing an `===== OTOMATIK KONTROL =====` PASS/FAIL block.
+
 ## Status / known limitations
 
-- Code is complete but **not yet compile-verified in CI** — run the build locally first.
+- Compile **and** in-server load are verified in CI on every push (see badge above); in-game gameplay (structure placement, vehicle physics) is verified manually.
 - Structures generate relative to the clicked block; terrain is not flattened first.
 - Vehicles use vanilla textures (planks/iron) mapped onto simple cuboid models; no custom PNG assets required.
 
