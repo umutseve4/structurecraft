@@ -39,7 +39,9 @@ Drop the jar plus [Fabric API](https://modrinth.com/mod/fabric-api) into `mods/`
 Every push and PR runs GitHub Actions (`build.yml`):
 
 1. **build** — compiles the mod (JDK 17, Gradle 8.8) and uploads the jar artifact.
-2. **smoke-test** — boots a real Fabric 1.20.1 dedicated server (loader 0.15.11) with the mod installed and asserts the server reaches `Done (`, printing an `===== OTOMATIK KONTROL =====` PASS/FAIL block.
+2. **smoke-test** — boots a real Fabric 1.20.1 dedicated server with the mod installed and asserts the server reaches `Done (`, printing an `===== OTOMATIK KONTROL =====` PASS/FAIL block. Loader and Fabric API versions are pinned from `gradle.properties` (single source of truth), so CI tests exactly the versions the mod is built against.
+
+On failure, the full server log and any crash reports are uploaded as the `server-log` artifact.
 
 ## Status / known limitations
 
