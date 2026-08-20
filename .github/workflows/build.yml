@@ -57,15 +57,18 @@ jobs:
           ls -la server/mods
           echo "STEP prepare OK" >> step_markers.txt
 
-      - name: Download Fabric server launcher (MC 1.20.1 / loader 0.15.11)
+      - name: Download Fabric server launcher (MC 1.20.1 / loader 0.16.14)
         run: |
           curl -fsSL -o server/server.jar \
-            "https://meta.fabricmc.net/v2/versions/loader/1.20.1/0.15.11/1.0.1/server/jar"
+            "https://meta.fabricmc.net/v2/versions/loader/1.20.1/0.16.14/1.0.1/server/jar"
           echo "STEP fabric-launcher OK" >> step_markers.txt
 
       - name: Download Fabric API for 1.20.1
         run: |
           URL=$(curl -fsSL "https://api.modrinth.com/v2/project/fabric-api/version?game_versions=%5B%221.20.1%22%5D&loaders=%5B%22fabric%22%5D" | jq -r '.[0].files[0].url')
+          if [ -z "$URL" ] || [ "$URL" = "null" ]; then
+            echo "Modrinth API'den Fabric API URL alınamadı"; exit 1
+          fi
           echo "Fabric API: $URL"
           curl -fsSL -o server/mods/fabric-api.jar "$URL"
           echo "STEP fabric-api OK" >> step_markers.txt
