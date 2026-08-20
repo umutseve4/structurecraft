@@ -1,3 +1,0 @@
-STEP prepare OK
-STEP fabric-launcher OK
-STEP fabric-api OK
